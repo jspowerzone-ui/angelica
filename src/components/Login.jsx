@@ -29,7 +29,8 @@ export default function Login() {
  const google = async () => {
   setError("");
   try {
-    await signInWithRedirect(auth, provider);
+    await signInWithPopup(auth, provider);
+    navigate("/home");
   } catch (err) {
     setError("No se pudo iniciar sesión con Google.");
   }

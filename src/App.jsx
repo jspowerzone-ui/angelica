@@ -803,13 +803,12 @@ export default function App() {
   }, []);
 
  useEffect(() => {
-  if (!user) return;
+  if (loading || !user) return;
 
   const unsubClasses = onSnapshot(
     collection(db, CLASSES_COL),
     (snap) => {
       setClasses(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-      setLoadingData(false);
     }
   );
 
@@ -832,7 +831,7 @@ export default function App() {
     unsubStudents();
     unsubAttendance();
   };
-}, [user]);
+}, [user, loading]);
 
   // ── CRUD Clases ──
   const addClass    = useCallback(async (data) => { await addDoc(collection(db, CLASSES_COL), data); }, []);

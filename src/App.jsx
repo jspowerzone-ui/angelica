@@ -803,10 +803,10 @@ export default function App() {
   }, []);
 
  useEffect(() => {
-  if (loading) return; // 🔥 NO user
+  if (!user) return;
 
   const unsubClasses = onSnapshot(
-    query(collection(db, CLASSES_COL)),
+    collection(db, CLASSES_COL),
     (snap) => {
       setClasses(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
       setLoadingData(false);
@@ -814,14 +814,14 @@ export default function App() {
   );
 
   const unsubStudents = onSnapshot(
-    query(collection(db, STUDENTS_COL)),
+    collection(db, STUDENTS_COL),
     (snap) => {
       setStudents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     }
   );
 
   const unsubAttendance = onSnapshot(
-    query(collection(db, ATTENDANCE_COL)),
+    collection(db, ATTENDANCE_COL),
     (snap) => {
       setAttendance(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     }
@@ -832,7 +832,7 @@ export default function App() {
     unsubStudents();
     unsubAttendance();
   };
-}, [loading]);
+}, [user]);
 
   // ── CRUD Clases ──
   const addClass    = useCallback(async (data) => { await addDoc(collection(db, CLASSES_COL), data); }, []);

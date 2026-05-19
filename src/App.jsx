@@ -804,22 +804,43 @@ export default function App() {
 
   // ── Listeners de Firestore — se montan una sola vez en el root ──
   // Así sobreviven al hard refresh sin perder datos ni reconectarse
-  useEffect(() => {
-    const unsubClasses = onSnapshot(query(collection(db, CLASSES_COL)), (snap) => {
+useEffect(() => {
+  if (!user) return; // 🔥 IMPORTANTE
+
+  const unsubClasses = onSnapshot(
+    query(collection(db, CLASSES_COL)),
+    (snap) => {
       setClasses(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
       setLoadingData(false);
-    }, (err) => { console.error("Error clases:", err); setLoadingData(false); });
+    },
+    (err) => {
+      console.error("Error clases:", err);
+      setLoadingData(false);
+    }
+  );
 
-    const unsubStudents = onSnapshot(query(collection(db, STUDENTS_COL)), (snap) => {
+  const unsubStudents = onSnapshot(
+    query(collection(db, STUDENTS_COL)),
+    (snap) => {
       setStudents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    }, (err) => console.error("Error estudiantes:", err));
+    },
+    (err) => console.error("Error estudiantes:", err)
+  );
 
-    const unsubAttendance = onSnapshot(query(collection(db, ATTENDANCE_COL)), (snap) => {
+  const unsubAttendance = onSnapshot(
+    query(collection(db, ATTENDANCE_COL)),
+    (snap) => {
       setAttendance(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    }, (err) => console.error("Error asistencia:", err));
+    },
+    (err) => console.error("Error asistencia:", err)
+  );
 
-    return () => { unsubClasses(); unsubStudents(); unsubAttendance(); };
-  }, []);
+  return () => {
+    unsubClasses();
+    unsubStudents();
+    unsubAttendance();
+  };
+}, [user]); // 🔥 también cambia esto
 
   // ── CRUD Clases ──
   const addClass    = useCallback(async (data) => { await addDoc(collection(db, CLASSES_COL), data); }, []);

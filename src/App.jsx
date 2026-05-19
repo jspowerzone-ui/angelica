@@ -801,14 +801,20 @@ export default function App() {
     });
     return () => unsub();
   }, []);
-
- useEffect(() => {
+useEffect(() => {
   if (loading || !user) return;
+
+  setLoadingData(true);
 
   const unsubClasses = onSnapshot(
     collection(db, CLASSES_COL),
     (snap) => {
       setClasses(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      setLoadingData(false); // OK aquí
+    },
+    (err) => {
+      console.error("classes error:", err);
+      setLoadingData(false); // 🔥 IMPORTANTE (evita bloqueo infinito)
     }
   );
 
@@ -816,14 +822,16 @@ export default function App() {
     collection(db, STUDENTS_COL),
     (snap) => {
       setStudents(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    }
+    },
+    (err) => console.error("students error:", err)
   );
 
   const unsubAttendance = onSnapshot(
     collection(db, ATTENDANCE_COL),
     (snap) => {
       setAttendance(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    }
+    },
+    (err) => console.error("attendance error:", err)
   );
 
   return () => {
